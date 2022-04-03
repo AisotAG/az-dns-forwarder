@@ -1,0 +1,28 @@
+replicaCount: 1
+
+image:
+  pullPolicy: IfNotPresent
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1024Mi
+  requests:
+    cpu: 50m
+    memory: 1024Mi
+
+datasource:
+  url: jdbc:postgresql://aisot-is-market-data-warehouse-postgresql:5432/postgres
+  username: postgres
+  password: postgres
+
+retentionPeriodMonths: 120
+
+fmp:
+  maxParallelRequests: 6
+
+postgresql:
+  image:
+    tag: 11.11.0-debian-10-r92
+  postgresqlPassword: postgres
+  fullnameOverride: aisot-is-market-data-warehouse-postgresql

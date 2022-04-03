@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "az-dns-forwarder.name" . }}
+  labels:
+    {{- include "az-dns-forwarder.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "az-dns-forwarder.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "az-dns-forwarder.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "az-dns-forwarder.name" . }}
+      imagePullSecrets:
+        - name: {{ .Values.imagePullSecret }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "ghcr.io/aisotag/docker/az-dns-forwarder:{{ .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 53
+              protocol: UDP
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}

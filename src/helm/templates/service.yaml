@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "az-dns-forwarder.name" . }}
+  labels:
+    {{- include "az-dns-forwarder.labels" . | nindent 4 }}
+  annotations:
+  {{ - if .Values.ingress.tls }}
+    tls:
+  {{ - end - }}
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+spec:
+  type: LoadBalancer
+{{- if .Values.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.loadBalancerIP }}
+{{- end }}
+  ports:
+    - port: 53
+      protocol: UDP
+      targetPort: 53
+  selector:
+    {{- include "az-dns-forwarder.selectorLabels" . | nindent 4 }}
