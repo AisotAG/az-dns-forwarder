@@ -9,6 +9,11 @@ spec:
   selector:
     matchLabels:
       {{- include "az-dns-forwarder.selectorLabels" . | nindent 6 }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: {{ .Values.maxSurge }}
+      maxUnavailable: {{ .Values.maxUnavailable }}
   template:
     metadata:
       labels:
@@ -26,3 +31,13 @@ spec:
               protocol: UDP
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: "app.kubernetes.io/name"
+                    operator: In
+                    values:
+                      - {{ include "az-dns-forwarder.name" . }}
+              topologyKey: "kubernetes.io/hostname"
