@@ -33,10 +33,13 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
       affinity:
         podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                  - key: "app.kubernetes.io/name"
-                    operator: In
-                    values:
-                      - {{ include "az-dns-forwarder.name" . }}
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: "app.kubernetes.io/name"
+                      operator: In
+                      values:
+                        - {{ include "az-dns-forwarder.name" . }}
+                topologyKey: "kubernetes.io/hostname"
